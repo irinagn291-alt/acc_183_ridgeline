@@ -129,12 +129,18 @@ public final class RidgelineDataStore: @unchecked Sendable {
     ///
     /// The generic is constrained to `Sendable` so the compiler enforces the rule
     /// that managed objects never leave the closure.
+    ///
+    /// Marked `@concurrent` so that, under `NonisolatedNonsendingByDefault`, this
+    /// method leaves the caller's actor before scheduling Core Data work. Without
+    /// that hop, `context.perform` would invoke a `@MainActor`-isolated closure on
+    /// its private queue and trap (`swift_task_checkIsolatedSwift`).
+    @concurrent
     public func perform<T: Sendable>(
         _ body: @escaping @Sendable (NSManagedObjectContext) throws -> T
     ) async throws -> T {
         let context = self.context
         return try await withCheckedThrowingContinuation { continuation in
-            context.perform {
+            context.perform { @Sendable in
                 do {
                     continuation.resume(returning: try body(context))
                 } catch {

@@ -51,7 +51,9 @@ public struct OnboardingAscentView: View {
                 }
 
                 RidgeButton(viewModel.isSaving ? "Saving…" : "Draw the ridge") {
-                    Task { _ = await viewModel.continueFromEntry() }
+                    Task { @MainActor in
+                        _ = await viewModel.continueFromEntry()
+                    }
                 }
                 .disabled(viewModel.isSaving)
             }

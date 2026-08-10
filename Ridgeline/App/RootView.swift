@@ -6,6 +6,7 @@ public struct RootView: View {
     @State private var showOnboarding: Bool?
     @State private var launchError: String?
     @State private var dashboardViewModel: ProfileDashboardViewModel?
+    @State private var onboardingViewModel: OnboardingAscentViewModel?
 
     private let container: RidgelineContainer
 
@@ -15,8 +16,8 @@ public struct RootView: View {
 
     public var body: some View {
         Group {
-            if showOnboarding == true {
-                OnboardingAscentView(viewModel: container.makeOnboardingViewModel()) {
+            if showOnboarding == true, let onboardingViewModel {
+                OnboardingAscentView(viewModel: onboardingViewModel) {
                     ensureDashboard()
                     showOnboarding = false
                 }
@@ -90,6 +91,7 @@ public struct RootView: View {
                     coordinator: coordinator,
                     onResetCompleted: {
                         dashboardViewModel = nil
+                        onboardingViewModel = container.makeOnboardingViewModel()
                         showOnboarding = true
                         coordinator.popToRoot()
                     }
@@ -162,6 +164,9 @@ public struct RootView: View {
         do {
             let empty = try await container.journalIsEmpty()
             if empty {
+                if onboardingViewModel == nil {
+                    onboardingViewModel = container.makeOnboardingViewModel()
+                }
                 showOnboarding = true
             } else {
                 container.onboardingStore.markOnboardingComplete()
