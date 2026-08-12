@@ -5,6 +5,7 @@ public struct RidgeSettingsView: View {
     @Bindable var viewModel: RidgeSettingsViewModel
     @Bindable var coordinator: RidgelineCoordinator
     let onResetCompleted: () -> Void
+    @State private var showContactUs = false
 
     public init(
         viewModel: RidgeSettingsViewModel,
@@ -51,6 +52,10 @@ public struct RidgeSettingsView: View {
                     coordinator.openGallery()
                 }
 
+                RidgeButton("Contact Us", accent: false) {
+                    showContactUs = true
+                }
+
                 panel("ABOUT") {
                     Text("Ridgeline")
                         .font(TopoType.bodyBold())
@@ -80,6 +85,11 @@ public struct RidgeSettingsView: View {
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { viewModel.load() }
+        .sheet(isPresented: $showContactUs) {
+            NavigationStack {
+                ContactUsWebView()
+            }
+        }
         .confirmationDialog(
             "Delete every ascent, route and gear note?",
             isPresented: $viewModel.confirmReset,

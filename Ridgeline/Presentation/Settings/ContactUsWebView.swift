@@ -5,7 +5,7 @@ import SwiftUI
 public struct ContactUsWebView: View {
     @Environment(\.dismiss) private var dismiss
 
-    private let contactURL = URL(string: "https://ridgeline-ascent.pro/contact-us")!
+    private let contactURL = URL(string: "https://rid-ge-li-ne.pro/contact-us")!
 
     public var body: some View {
         SafariView(url: contactURL)
